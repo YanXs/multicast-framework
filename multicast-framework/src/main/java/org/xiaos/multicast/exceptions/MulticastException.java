@@ -9,4 +9,8 @@ public class MulticastException extends RuntimeException {
     public MulticastException(String message) {
         super(message);
     }
+
+    public MulticastException(String msg, Throwable cause){
+        super(msg, cause);
+    }
 }

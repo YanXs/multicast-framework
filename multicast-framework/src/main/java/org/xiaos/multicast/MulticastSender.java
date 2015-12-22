@@ -11,7 +11,7 @@ import java.net.*;
 /**
  * Created by xiaoshu on 2015/12/20.
  */
-class MulticastSender {
+public class MulticastSender {
 
     private final Logger logger = LoggerFactory.getLogger(MulticastSender.class);
 
@@ -89,10 +89,10 @@ class MulticastSender {
     private MulticastMessage convertMessageIfNecessary(final Object object){
         if (object instanceof MulticastMessage)
             return (MulticastMessage)object;
-        return getMessageConverter().toMessage(object);
+        return getMessageConverter().toMessage(object, new MessageProperties());
     }
 
     private void send(DatagramPacketWrapper datagramPacketWrapper) throws IOException {
-        socket.send(datagramPacketWrapper.getDategramPacket());
+        socket.send(datagramPacketWrapper.getRequestDatagramPacket());
     }
 }

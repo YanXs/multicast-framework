@@ -1,5 +1,6 @@
 package org.xiaos.multicast.converter;
 
+import org.xiaos.multicast.MessageProperties;
 import org.xiaos.multicast.MulticastMessage;
 
 /**
@@ -7,5 +8,7 @@ import org.xiaos.multicast.MulticastMessage;
  */
 public interface MulticastMessageConverter {
 
-    MulticastMessage toMessage(Object object);
+    MulticastMessage toMessage(Object object, MessageProperties messageProperties);
+
+    Object fromMessage(MulticastMessage multicastMessage);
 }
