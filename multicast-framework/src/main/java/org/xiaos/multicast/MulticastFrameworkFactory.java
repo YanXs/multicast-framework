@@ -8,11 +8,11 @@ public class MulticastFrameworkFactory {
     private MulticastFrameworkFactory() {
     }
 
-    public static MulticastFramework newMulticastSender(String multiAddress, int port) {
-        return new MulticastFramework(multiAddress, port, true);
+    public static MulticastSender newMulticastSender(String multiAddress, int port) {
+        return new MulticastSender(multiAddress, port);
     }
 
-    public static MulticastFramework newMulticastReceiver(String multiAddress, int port) {
-        return new MulticastFramework(multiAddress, port, false);
+    public static MulticastReceiver newMulticastReceiver(String multiAddress, int port) {
+        return new MulticastReceiver(multiAddress, port);
     }
 }

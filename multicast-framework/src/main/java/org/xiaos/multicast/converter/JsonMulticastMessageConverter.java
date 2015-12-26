@@ -1,5 +1,6 @@
 package org.xiaos.multicast.converter;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
@@ -39,6 +40,7 @@ public class JsonMulticastMessageConverter extends AbstractMessageConverter {
      */
     protected void initializeJsonObjectMapper() {
         jsonObjectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        jsonObjectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
     @Override

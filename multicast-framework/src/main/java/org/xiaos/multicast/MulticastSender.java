@@ -15,9 +15,11 @@ public class MulticastSender {
 
     private final Logger logger = LoggerFactory.getLogger(MulticastSender.class);
 
+    public static final int DEFAULT_TIME_TO_LIVE = 1;
     private MulticastSocket socket;
     private InetAddress inetAddress;
     private int port;
+    private int ttl = DEFAULT_TIME_TO_LIVE;
     private MulticastMessageConverter messageConverter;
 
     public MulticastSocket getSocket() {
@@ -44,6 +46,14 @@ public class MulticastSender {
         this.port = port;
     }
 
+    public int getTtl() {
+        return ttl;
+    }
+
+    public void setTtl(int ttl) {
+        this.ttl = ttl;
+    }
+
     public MulticastMessageConverter getMessageConverter() throws MulticastException {
         if (messageConverter == null)
             throw new MulticastException("no message converter setted!");
@@ -54,28 +64,25 @@ public class MulticastSender {
         this.messageConverter = messageConverter;
     }
 
-    public MulticastSender(String multiAddress, int port, int ttl) {
+    public MulticastSender(String multiAddress, int port) {
         try {
             this.inetAddress = InetAddress.getByName(multiAddress);
             this.port = port;
-            SocketAddress socketAddress = new InetSocketAddress(inetAddress, port);
-            this.socket = new MulticastSocket(socketAddress);
-            socket.setTimeToLive(ttl);
+            this.socket = new MulticastSocket(port);
         } catch (UnknownHostException e) {
             logger.error(e.getMessage());
+            close();
         } catch (IOException e) {
             logger.error(e.getMessage());
-        }finally {
-            if (socket != null)
-                socket.close();
+            close();
         }
     }
 
-    public void convertAndSend(Object object){
+    public void convertAndSend(Object object) throws IOException {
         convertAndSend(this.inetAddress, this.port, object);
     }
 
-    public void convertAndSend(InetAddress inetAddress, int port, final Object message){
+    public void convertAndSend(InetAddress inetAddress, int port, final Object message) throws IOException {
         //todo convert object to json or xml
         MulticastMessage requestMessage = convertMessageIfNecessary(message);
         DatagramPacketWrapper packetWrapper = new DatagramPacketWrapper(requestMessage, inetAddress, port);
@@ -83,16 +90,31 @@ public class MulticastSender {
             send(packetWrapper);
         } catch (IOException e) {
             logger.error(e.getMessage());
+            throw e;
         }
     }
 
-    private MulticastMessage convertMessageIfNecessary(final Object object){
+    public void send(MulticastMessage message) throws IOException {
+        send(this.inetAddress, this.port, message);
+    }
+
+    public void send(InetAddress inetAddress, int port, final MulticastMessage message) throws IOException {
+        DatagramPacketWrapper packetWrapper = new DatagramPacketWrapper(message, inetAddress, port);
+        send(packetWrapper);
+    }
+
+    private MulticastMessage convertMessageIfNecessary(final Object object) {
         if (object instanceof MulticastMessage)
-            return (MulticastMessage)object;
+            return (MulticastMessage) object;
         return getMessageConverter().toMessage(object, new MessageProperties());
     }
 
     private void send(DatagramPacketWrapper datagramPacketWrapper) throws IOException {
         socket.send(datagramPacketWrapper.getRequestDatagramPacket());
+    }
+
+    private void close() {
+        if (socket != null)
+            socket.close();
     }
 }

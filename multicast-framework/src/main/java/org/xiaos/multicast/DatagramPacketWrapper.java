@@ -1,5 +1,8 @@
 package org.xiaos.multicast;
 
+import org.xiaos.multicast.util.ObjectUtils;
+
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 
@@ -9,20 +12,29 @@ public class DatagramPacketWrapper {
     private DatagramPacket requestDatagramPacket;
     private DatagramPacket receivedDatagramPacket;
 
-    public DatagramPacketWrapper(MulticastMessage message, InetAddress inetAddress, int port){
-        requestDatagramPacket = new DatagramPacket(message.getBody(), message.bodyLength(), inetAddress, port);
+    public DatagramPacketWrapper(Object message, InetAddress inetAddress, int port) throws IOException {
+        byte[] messageToSend = ObjectUtils.objectToBytes(message);
+        requestDatagramPacket = new DatagramPacket(messageToSend, messageToSend.length, inetAddress, port);
     }
 
-    public DatagramPacketWrapper(){
-        byte buffer[] = new byte[MAX_BUFFER_SIZE];
+    public DatagramPacketWrapper() {
+        byte[] buffer = new byte[MAX_BUFFER_SIZE];
         receivedDatagramPacket = new DatagramPacket(buffer, buffer.length);
+    }
+
+    public DatagramPacket getReceivedDatagramPacket() {
+        return receivedDatagramPacket;
+    }
+
+    public void setReceivedDatagramPacket(DatagramPacket receivedDatagramPacket) {
+        this.receivedDatagramPacket = receivedDatagramPacket;
     }
 
     public DatagramPacket getRequestDatagramPacket() {
         return requestDatagramPacket;
     }
 
-    public DatagramPacket getReceivedDatagramPacket() {
-        return receivedDatagramPacket;
+    public void setRequestDatagramPacket(DatagramPacket requestDatagramPacket) {
+        this.requestDatagramPacket = requestDatagramPacket;
     }
 }
