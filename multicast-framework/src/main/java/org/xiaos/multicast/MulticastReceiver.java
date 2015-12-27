@@ -2,6 +2,9 @@ package org.xiaos.multicast;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xiaos.multicast.converter.MulticastMessageConverter;
+import org.xiaos.multicast.core.MessageType;
+import org.xiaos.multicast.core.MulticastMessage;
 import org.xiaos.multicast.exceptions.MulticastMessageProcessException;
 import org.xiaos.multicast.util.ObjectUtils;
 
@@ -22,6 +25,8 @@ public class MulticastReceiver implements Runnable {
     public static final int DEFAULT_RECEIVE_RETRY = 3;
 
     private MulticastSocket socket;
+
+    private MulticastMessageConverter multicastMessageConverter;
 
     private String multiAddress;
 
@@ -51,6 +56,14 @@ public class MulticastReceiver implements Runnable {
 
     public void setProcessReceivedPacketAsyn(boolean processReceivedPacketAsyn) {
         this.processReceivedPacketAsyn = processReceivedPacketAsyn;
+    }
+
+    public void setMulticastMessageConverter(MulticastMessageConverter multicastMessageConverter) {
+        this.multicastMessageConverter = multicastMessageConverter;
+    }
+
+    public MulticastMessageConverter getMulticastMessageConverter() {
+        return multicastMessageConverter;
     }
 
     public boolean isActive() {
@@ -116,9 +129,9 @@ public class MulticastReceiver implements Runnable {
         } else if (multicastMessage.getMessageType().equals(MessageType.REFRESH_CACHE)) {
             logger.info("received " + MessageType.REFRESH_CACHE + " message");
         } else if (multicastMessage.getMessageType().equals(MessageType.MESSAGE_CONTAINER)) {
-            //todo auto convert to object
+            getMulticastMessageConverter().fromMessage(multicastMessage);
         } else {
-            //todo
+            throw new MulticastMessageProcessException("Illegal message type!");
         }
     }
 

@@ -8,8 +8,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xiaos.multicast.MessageProperties;
-import org.xiaos.multicast.MulticastMessage;
+import org.xiaos.multicast.core.MessageProperties;
+import org.xiaos.multicast.core.MulticastMessage;
 import org.xiaos.multicast.exceptions.MessageConversionException;
 
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.io.IOException;
 public class JsonMulticastMessageConverter extends AbstractMessageConverter {
     private static Logger log = LoggerFactory.getLogger(JsonMulticastMessageConverter.class);
     private ObjectMapper jsonObjectMapper = new ObjectMapper();
-    private JavaTypeMapper javaTypeMapper;
+    private JavaTypeMapper javaTypeMapper = new JsonJavaTypeMapper();
 
     public JsonMulticastMessageConverter() {
         initializeJsonObjectMapper();

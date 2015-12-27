@@ -1,4 +1,4 @@
-package org.xiaos.multicast;
+package org.xiaos.multicast.core;
 
 public enum MessageType {
     REFRESH_CACHE("refresh_cache"), MESSAGE_CONTAINER("message_container");

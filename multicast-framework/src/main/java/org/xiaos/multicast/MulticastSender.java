@@ -3,6 +3,9 @@ package org.xiaos.multicast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xiaos.multicast.converter.MulticastMessageConverter;
+import org.xiaos.multicast.core.MessagePostProcessor;
+import org.xiaos.multicast.core.MessageProperties;
+import org.xiaos.multicast.core.MulticastMessage;
 import org.xiaos.multicast.exceptions.MulticastException;
 
 import java.io.IOException;
@@ -82,25 +85,28 @@ public class MulticastSender {
         convertAndSend(this.inetAddress, this.port, object);
     }
 
+    public void convertAndSend(Object object, MessagePostProcessor messagePostProcessor) throws IOException {
+        convertAndSend(this.inetAddress, this.port, object, messagePostProcessor);
+    }
+
     public void convertAndSend(InetAddress inetAddress, int port, final Object message) throws IOException {
-        //todo convert object to json or xml
         MulticastMessage requestMessage = convertMessageIfNecessary(message);
-        DatagramPacketWrapper packetWrapper = new DatagramPacketWrapper(requestMessage, inetAddress, port);
-        try {
-            send(packetWrapper);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            throw e;
-        }
+        send(requestMessage, inetAddress, port);
+    }
+
+    public void convertAndSend(InetAddress inetAddress, int port, final Object message, final MessagePostProcessor messagePostProcessor) throws IOException {
+        MulticastMessage requestMessage = convertMessageIfNecessary(message);
+        requestMessage = messagePostProcessor.postProcessMessage(requestMessage);
+        send(requestMessage,inetAddress,port);
     }
 
     public void send(MulticastMessage message) throws IOException {
-        send(this.inetAddress, this.port, message);
+        send(message,this.inetAddress, this.port);
     }
 
-    public void send(InetAddress inetAddress, int port, final MulticastMessage message) throws IOException {
-        DatagramPacketWrapper packetWrapper = new DatagramPacketWrapper(message, inetAddress, port);
-        send(packetWrapper);
+    public void send(MulticastMessage requestMessage, InetAddress inetAddress, int port) throws IOException {
+        DatagramPacketWrapper packetWrapper = new DatagramPacketWrapper(requestMessage, inetAddress, port);
+        doSend(packetWrapper);
     }
 
     private MulticastMessage convertMessageIfNecessary(final Object object) {
@@ -109,7 +115,7 @@ public class MulticastSender {
         return getMessageConverter().toMessage(object, new MessageProperties());
     }
 
-    private void send(DatagramPacketWrapper datagramPacketWrapper) throws IOException {
+    private void doSend(DatagramPacketWrapper datagramPacketWrapper) throws IOException {
         socket.send(datagramPacketWrapper.getRequestDatagramPacket());
     }
 

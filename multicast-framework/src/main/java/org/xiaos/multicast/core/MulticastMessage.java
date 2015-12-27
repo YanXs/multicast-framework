@@ -1,4 +1,7 @@
-package org.xiaos.multicast;
+package org.xiaos.multicast.core;
+
+import org.xiaos.multicast.core.MessageProperties;
+import org.xiaos.multicast.core.MessageType;
 
 import java.io.Serializable;
 
